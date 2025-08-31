@@ -1,22 +1,36 @@
 import pygame, simpleGE, random
 
+""" 
+Asset Attributions:
+
+cards - Kenney: https://www.kenney.nl/assets/playing-cards-pack
+
+"""
+
 class Game(simpleGE.Scene):
-    def __init__(self):
+    def __init__(self, size = (640, 640)):
         super().__init__()
-        self.player = Player(self)
+        self.screen = pygame.display.set_mode(size)
+        self.background = pygame.Surface(self.screen.get_size())
         pygame.Surface.fill(self.background, (0, 128, 255))
         self.checkerboard = []
         self.ROWS = 8
         self.COLS = 8
         self.loadCheckerboard()
-        self.sprites = [self.player, self.checkerboard]
+        
+        self.redChecker = Checker(self)
+        self.redChecker.setColor(self.redChecker.RED)
+        self.redChecker.position = self.checkerboard[0][7].position
+        self.sprites = [self.checkerboard, self.redChecker]
 
     def process(self):
-        for i in range(self.ROWS):
-            for j in range(self.COLS):
-                if self.checkerboard[i][j].clicked:
-                    currentState = self.checkerboard[i][j].state
-                    self.checkerboard[i][j].changeState(currentState)
+        if self.redChecker.mouseDown:
+            self.redChecker.position = pygame.mouse.get_pos()
+            for row in self.checkerboard:
+                for square in row:
+                    if self.redChecker.collidesWith(square):
+                        self.redChecker.position = square.position
+                        break
                     
     
     def loadCheckerboard(self):
@@ -39,10 +53,6 @@ class Game(simpleGE.Scene):
                 newSquare.setState(currentVal)
                 newSquare.position = (150 + (50 * row), 25 + (50 * col))
                 self.checkerboard[row].append(newSquare)
-
-class Player(simpleGE.Sprite):
-    def __init__(self, scene):
-        super().__init__(scene)
 
 class Square(simpleGE.Sprite):
     def __init__(self, scene):
@@ -69,6 +79,23 @@ class Square(simpleGE.Sprite):
         else:
             self.copyImage(self.images[self.RED])
             self.setSize(50,50)
+
+class Checker(simpleGE.Sprite):
+    def __init__(self, scene):
+        super().__init__(scene)
+        self.images = [
+            pygame.image.load("redChecker.png"),
+            pygame.image.load("blackChecker.png")
+        ]
+        self.RED = 0
+        self.BLACK = 1
+        self.state = self.RED
+        self.setSize(40,40)
+        self.setBoundAction(self.CONTINUE)
+
+    def setColor(self, state):
+        self.state = state
+        self.copyImage(self.images[self.state])
 
 def main():
     game = Game()
