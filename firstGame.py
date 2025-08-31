@@ -8,16 +8,15 @@ class Game(simpleGE.Scene):
         self.checkerboard = []
         self.ROWS = 8
         self.COLS = 8
-        startingX = 200
-        startingY = 25
         self.loadCheckerboard()
         self.sprites = [self.player, self.checkerboard]
 
-    def _process(self):
+    def process(self):
         for i in range(self.ROWS):
             for j in range(self.COLS):
                 if self.checkerboard[i][j].clicked:
-                    self.checkerboard[i][j].state = 0
+                    currentState = self.checkerboard[i][j].state
+                    self.checkerboard[i][j].changeState(currentState)
                     
     
     def loadCheckerboard(self):
@@ -62,6 +61,14 @@ class Square(simpleGE.Sprite):
         self.state = state
         self.copyImage(self.images[state])
         self.setSize(50,50)
+    
+    def changeState(self, state):
+        if state == self.RED:
+            self.copyImage(self.images[self.BLACK])
+            self.setSize(50,50)
+        else:
+            self.copyImage(self.images[self.RED])
+            self.setSize(50,50)
 
 def main():
     game = Game()
