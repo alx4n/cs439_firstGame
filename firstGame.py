@@ -55,8 +55,8 @@ class Square(simpleGE.Sprite):
     def __init__(self, scene):
         super().__init__(scene)
         self.images = [
-            pygame.image.load("red-square.png"),
-            pygame.image.load("black-square.png")
+            pygame.image.load("assets/red-square.png"),
+            pygame.image.load("assets/black-square.png")
         ]
         self.setSize(50,50)
         self.RED = 0
@@ -99,8 +99,8 @@ class Checker(simpleGE.Sprite):
     def __init__(self, scene):
         super().__init__(scene)
         self.images = [
-            pygame.image.load("redChecker.png"),
-            pygame.image.load("blackChecker.png")
+            pygame.image.load("assets/redChecker.png"),
+            pygame.image.load("assets/blackChecker.png")
         ]
         self.RED = 0
         self.BLACK = 1
@@ -115,11 +115,11 @@ class Checker(simpleGE.Sprite):
 class Card(simpleGE.Sprite):
     def __init__(self, scene):
         super().__init__(scene)
-        self.setImage("card images/card_back.png")
+        self.setImage("assets/card images/card_back.png")
         self.setSize(100,100)
         self.position = (100, 500)
         self.images = []
-        with open('card images/_cards.csv', newline='') as csvfile:
+        with open('assets/card images/_cards.csv', newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 self.images.append(pygame.image.load("card images/" + row['card_name']))
