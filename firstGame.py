@@ -1,4 +1,4 @@
-import pygame, simpleGE, random
+import pygame, simpleGE, random, csv
 
 """ 
 Asset Attributions:
@@ -111,6 +111,19 @@ class Checker(simpleGE.Sprite):
     def setColor(self, state):
         self.state = state
         self.copyImage(self.images[self.state])
+
+class Card(simpleGE.Sprite):
+    def __init__(self, scene):
+        super().__init__(scene)
+        self.setImage("card images/card_back.png")
+        self.setSize(100,100)
+        self.position = (100, 500)
+        self.images = []
+        with open('card images/_cards.csv', newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                self.images.append(pygame.image.load("card images/" + row['card_name']))
+       
 
 def main():
     game = Game()
