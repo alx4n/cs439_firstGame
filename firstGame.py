@@ -24,15 +24,10 @@ class Game(simpleGE.Scene):
         self.sprites = [self.checkerboard, self.redChecker]
 
     def process(self):
-        if self.redChecker.mouseDown:
-            self.redChecker.position = pygame.mouse.get_pos()
-            for row in self.checkerboard:
-                for square in row:
-                    if self.redChecker.collidesWith(square):
-                        self.redChecker.position = square.position
-                        break
+        for row in self.checkerboard:
+            for square in row:
+                square.isTouchingSide()
                     
-    
     def loadCheckerboard(self):
         map = [
             [0,1,0,1,0,1,0,1],
@@ -52,6 +47,8 @@ class Game(simpleGE.Scene):
                 newSquare = Square(self)
                 newSquare.setState(currentVal)
                 newSquare.position = (150 + (50 * row), 25 + (50 * col))
+                newSquare.row = row
+                newSquare.col = col
                 self.checkerboard[row].append(newSquare)
 
 class Square(simpleGE.Sprite):
@@ -66,6 +63,12 @@ class Square(simpleGE.Sprite):
         self.BLACK = 1
         self.state = self.RED
         self.setBoundAction(self.HIDE)
+        self.row = 0
+        self.col = 0
+        self.isTouchingLeft = False
+        self.isTouchingRight = False
+        self.isTouchingBottom = False
+        self.isTouchingTop = False
 
     def setState(self, state):
         self.state = state
@@ -79,6 +82,18 @@ class Square(simpleGE.Sprite):
         else:
             self.copyImage(self.images[self.RED])
             self.setSize(50,50)
+
+    def isTouchingSide(self):
+        if (self.col + 1) < self.scene.COLS:
+            if self.scene.checkerboard[self.row][self.col + 1]:
+                self.isTouchingLeft = True
+        if self.scene.checkerboard[self.row][self.col - 1]:
+            self.isTouchingRight = True
+        if self.scene.checkerboard[self.row - 1][self.col]:
+            self.isTouchingTop = True
+        if (self.row + 1) < self.scene.ROWS:
+            if self.scene.checkerboard[self.row + 1][self.col] != None:
+                self.isTouchingBottom = True       
 
 class Checker(simpleGE.Sprite):
     def __init__(self, scene):
