@@ -13,6 +13,15 @@ class Game(simpleGE.Scene):
         self.screen = pygame.display.set_mode(size)
         self.background = pygame.Surface(self.screen.get_size())
         pygame.Surface.fill(self.background, (0, 128, 255))
+        
+        self.cards = []
+        for i in range(4):
+            newCard = Card(self)
+            newCard.position = (150 + (i * 100), 500)
+            newCard.hide()
+            self.cards.append(newCard)
+        self.cards[0].show()
+        
         self.checkerboard = []
         self.ROWS = 8
         self.COLS = 8
@@ -21,12 +30,20 @@ class Game(simpleGE.Scene):
         self.redChecker = Checker(self)
         self.redChecker.setColor(self.redChecker.RED)
         self.redChecker.position = self.checkerboard[0][7].position
-        self.sprites = [self.checkerboard, self.redChecker]
+        self.sprites = [self.checkerboard, self.redChecker, self.cards]
 
     def process(self):
         for row in self.checkerboard:
             for square in row:
                 square.isTouchingSide()
+        if self.cards[1].visible == False:
+            if self.cards[0].clicked:
+                for i in range(1,4):
+                    self.cards[i].drawCard()
+                    self.cards[i].show()
+        for i in range(1,4):
+            if self.cards[i].clicked:
+                self.cards[i].drawCard()
                     
     def loadCheckerboard(self):
         map = [
@@ -120,9 +137,15 @@ class Card(simpleGE.Sprite):
         self.position = (100, 500)
         self.images = []
         with open('assets/card images/_cards.csv', newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
+            reader = csv.reader(csvfile)
             for row in reader:
-                self.images.append(pygame.image.load("card images/" + row['card_name']))
+                self.images.append(pygame.image.load('assets/card images/' + row[0] + '.png'))
+        for i in range(0,53):
+            self.images[i] = pygame.transform.scale(self.images[i], (100,100))
+
+    def drawCard(self):
+        self.value = random.randint(1,52)
+        self.copyImage(self.images[self.value])
        
 
 def main():
