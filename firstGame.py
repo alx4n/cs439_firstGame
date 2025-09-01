@@ -43,8 +43,10 @@ class Game(simpleGE.Scene):
                     self.cards[i].show()
         for i in range(1,4):
             if self.cards[i].clicked:
+                index = self.cards[i].index
+                print(self.cards[i].getMovement(index))
                 self.cards[i].drawCard()
-                    
+            
     def loadCheckerboard(self):
         map = [
             [0,1,0,1,0,1,0,1],
@@ -136,17 +138,27 @@ class Card(simpleGE.Sprite):
         self.setSize(100,100)
         self.position = (100, 500)
         self.images = []
+        self.cardNames = []
+        self.dict = {}
+        self.index = 0
         with open('assets/card images/_cards.csv', newline='') as csvfile:
-            reader = csv.reader(csvfile)
+            reader = csv.DictReader(csvfile, delimiter=",")
             for row in reader:
-                self.images.append(pygame.image.load('assets/card images/' + row[0] + '.png'))
+                self.images.append(pygame.image.load('assets/card images/' + row['card_name'] + '.png'))
+                self.cardNames.append(row['card_name'])
+                self.dict.update({row['card_name']: row['movement_points']})
         for i in range(0,53):
             self.images[i] = pygame.transform.scale(self.images[i], (100,100))
 
     def drawCard(self):
-        self.value = random.randint(1,52)
+        self.value = random.randint(2,53)
+        self.index = self.value
         self.copyImage(self.images[self.value])
-       
+
+    def getMovement(self, index):
+        self.card = self.cardNames[index]
+        self.movement = int(self.dict[self.card])
+        return self.movement
 
 def main():
     game = Game()
