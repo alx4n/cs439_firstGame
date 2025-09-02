@@ -9,7 +9,10 @@ This is a 2D game in which the user controls where they move their checker by ch
 
 ## Primary Sprites
 ### Square
-Each square on the checkerboard is its own sprite. The square is a subclass of the simpleGE sprite. Squares will be used to detect collision with the checker for placement and know whether they are connected to other squares. 
+Each square on the checkerboard is its own sprite. The square is a subclass of the simpleGE sprite. Squares will be used to detect collision with the checker for placement and know whether they are connected to other squares. Each square is 50x50 pixels and has CONTINUE behavior on a boundary. The squares remain on screen for the entire game.
 
 ### Checker
-The checker
+Each checker is its own sprite, which is a subclass of the simpleGE sprite. Checkers move based on the movement points alloted by the card selected and can only move to adjacent squares. Each checker is 40x40 pixels and is bounded by the checkerboard boundaries. The checkers remain on screen for the entire game.
+
+### Card
+The card is a simpleGE sprite that takes on the image of one of 52 cards from a standard deck or a card back from the Kenney cards pack, sized at 100x100 pixels. Cards have a fixed position at the bottom of the screen and face-up cards are hidden until the deck is pressed. Each card has a value that determines how much movement the player can take. The color of the card represents which color tile the player must land on.
