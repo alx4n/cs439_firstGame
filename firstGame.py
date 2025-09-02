@@ -146,6 +146,37 @@ class Checker(simpleGE.Sprite):
                 
     def moveSpaces(self):
         if self.isKeyPressed(pygame.K_LEFT):
+            if self.scene.currentSquare.isTouchingLeft:
+                self.position = self.scene.checkerboard[self.scene.row - 1][self.scene.col].position
+                self.scene.currentSquare = self.scene.checkerboard[self.scene.row - 1][self.scene.col]
+            else:
+                self.position = self.scene.currentSquare.position
+        if self.isKeyPressed(pygame.K_RIGHT):
+            if self.scene.currentSquare.isTouchingRight:
+                self.position = self.scene.checkerboard[self.scene.row + 1][self.scene.col].position
+                self.scene.currentSquare = self.scene.checkerboard[self.scene.row + 1][self.scene.col]
+            else:
+                self.position = self.scene.currentSquare.position
+        if self.isKeyPressed(pygame.K_UP):
+            if self.scene.currentSquare.isTouchingTop:
+                self.position = self.scene.checkerboard[self.scene.row][self.scene.col - 1].position
+                self.scene.currentSquare = self.scene.checkerboard[self.scene.row][self.scene.col - 1]
+            else:
+                self.position = self.scene.currentSquare.position
+        if self.isKeyPressed(pygame.K_DOWN):
+            if self.scene.currentSquare.isTouchingBottom:
+                self.position = self.scene.checkerboard[self.scene.row][self.scene.col + 1].position
+                self.scene.currentSquare = self.scene.checkerboard[self.scene.row][self.scene.col + 1]
+            else:
+                self.position = self.scene.currentSquare.position
+        pass
+
+class Card():
+    def __init__(self, name, value, color, placement, image):
+        self.name = name
+        self.value = value
+        self.color = color
+        self.placement = placement
         self.image = image
 
 class CardSprite(simpleGE.Sprite):
