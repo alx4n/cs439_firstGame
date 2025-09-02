@@ -15,37 +15,47 @@ class Game(simpleGE.Scene):
         pygame.Surface.fill(self.background, (0, 128, 255))
         
         self.cards = []
+        with open('assets/card images/_cards.csv', newline='') as csvfile:
+            reader = csv.DictReader(csvfile, delimiter=",")
+            for row in reader:
+                newCard = Card(row['card_name'], row['movement_points'], row['color'], row['placement'], pygame.image.load('assets/card images/' + row['card_name'] + '.png'))
+                self.cards.append(newCard)
+        self.onScreenCards = []
         for i in range(4):
-            newCard = Card(self)
+            newCard = CardSprite(self)
             newCard.position = (150 + (i * 100), 500)
             newCard.hide()
-            self.cards.append(newCard)
-        self.cards[0].show()
+            self.onScreenCards.append(newCard)
+        self.onScreenCards[0].show()
         
         self.checkerboard = []
         self.ROWS = 8
         self.COLS = 8
         self.loadCheckerboard()
+        self.row = 0
+        self.col = 7
+        self.currentSquare = self.checkerboard[self.row][self.col]
         
         self.redChecker = Checker(self)
         self.redChecker.setColor(self.redChecker.RED)
-        self.redChecker.position = self.checkerboard[0][7].position
-        self.sprites = [self.checkerboard, self.redChecker, self.cards]
+        self.redChecker.position = self.currentSquare.position
+        self.sprites = [self.checkerboard, self.redChecker, self.onScreenCards]
 
     def process(self):
         for row in self.checkerboard:
             for square in row:
                 square.isTouchingSide()
-        if self.cards[1].visible == False:
-            if self.cards[0].clicked:
+        if self.onScreenCards[1].visible == False:
+            if self.onScreenCards[0].clicked:
                 for i in range(1,4):
-                    self.cards[i].drawCard()
-                    self.cards[i].show()
+                    self.onScreenCards[i].drawCard()
+                    self.onScreenCards[i].show()
         for i in range(1,4):
-            if self.cards[i].clicked:
-                index = self.cards[i].index
-                print(self.cards[i].getMovement(index))
-                self.cards[i].drawCard()
+            if self.onScreenCards[i].clicked:
+                index = self.onScreenCards[i].value
+                print("You can move " + str(self.cards[index].value) + " space(s)")
+                self.redChecker.moveSpaces()
+                self.onScreenCards[i].drawCard()
             
     def loadCheckerboard(self):
         map = [
@@ -103,11 +113,11 @@ class Square(simpleGE.Sprite):
             self.setSize(50,50)
 
     def isTouchingSide(self):
+        if self.scene.checkerboard[self.row][self.col - 1]:
+            self.isTouchingLeft = True   
         if (self.col + 1) < self.scene.COLS:
             if self.scene.checkerboard[self.row][self.col + 1]:
-                self.isTouchingLeft = True
-        if self.scene.checkerboard[self.row][self.col - 1]:
-            self.isTouchingRight = True
+              self.isTouchingRight = True
         if self.scene.checkerboard[self.row - 1][self.col]:
             self.isTouchingTop = True
         if (self.row + 1) < self.scene.ROWS:
@@ -130,24 +140,24 @@ class Checker(simpleGE.Sprite):
     def setColor(self, state):
         self.state = state
         self.copyImage(self.images[self.state])
+    
+    def process(self):
+        self.moveSpaces()
+                
+    def moveSpaces(self):
+        if self.isKeyPressed(pygame.K_LEFT):
+        self.image = image
 
-class Card(simpleGE.Sprite):
+class CardSprite(simpleGE.Sprite):
     def __init__(self, scene):
         super().__init__(scene)
         self.setImage("assets/card images/card_back.png")
         self.setSize(100,100)
         self.position = (100, 500)
         self.images = []
-        self.cardNames = []
-        self.dict = {}
         self.index = 0
-        with open('assets/card images/_cards.csv', newline='') as csvfile:
-            reader = csv.DictReader(csvfile, delimiter=",")
-            for row in reader:
-                self.images.append(pygame.image.load('assets/card images/' + row['card_name'] + '.png'))
-                self.cardNames.append(row['card_name'])
-                self.dict.update({row['card_name']: row['movement_points']})
         for i in range(0,53):
+            self.images.append(self.scene.cards[i].image)
             self.images[i] = pygame.transform.scale(self.images[i], (100,100))
 
     def drawCard(self):
