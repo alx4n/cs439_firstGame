@@ -62,11 +62,9 @@ class Game(simpleGE.Scene):
                 if self.checkerboard[self.currentSquare.row][self.currentSquare.col - 1].color != 2:
                     self.redChecker.position = self.checkerboard[self.currentSquare.row][self.currentSquare.col - 1].position
                     self.checkerboard[self.currentSquare.row][self.currentSquare.col - 1].checkCollision()
-                    self.currentSquare = self.checkerboard[self.currentSquare.row][self.currentSquare.col - 1]
                     print(self.currentSquare.row, self.currentSquare.col)
             else:
                 print(self.currentSquare.isTouchingLeft)
-               # self.redChecker.position = self.currentSquare.position
                 print(self.currentSquare.row, self.currentSquare.col)
         if self.isKeyPressed(pygame.K_RIGHT):
             if self.currentSquare.isTouchingRight:
@@ -74,11 +72,9 @@ class Game(simpleGE.Scene):
                 if self.checkerboard[self.currentSquare.row][self.currentSquare.col + 1].color != 2:
                     self.redChecker.position = self.checkerboard[self.currentSquare.row][self.currentSquare.col + 1].position
                     self.checkerboard[self.currentSquare.row][self.currentSquare.col + 1].checkCollision()
-                    self.currentSquare = self.checkerboard[self.currentSquare.row][self.currentSquare.col + 1]
                     print(self.currentSquare.row, self.currentSquare.col)
             else:
                 print(self.currentSquare.isTouchingRight)
-                #self.redChecker.position = self.currentSquare.position
                 print(self.currentSquare.row, self.currentSquare.col)
         if self.isKeyPressed(pygame.K_UP):
             if self.currentSquare.isTouchingTop:
@@ -86,11 +82,9 @@ class Game(simpleGE.Scene):
                 if self.checkerboard[self.currentSquare.row - 1][self.currentSquare.col].color != 2:
                     self.redChecker.position = self.checkerboard[self.currentSquare.row - 1][self.currentSquare.col].position
                     self.checkerboard[self.currentSquare.row - 1][self.currentSquare.col].checkCollision()
-                    self.currentSquare = self.checkerboard[self.currentSquare.row - 1][self.currentSquare.col]
                     print(self.currentSquare.row, self.currentSquare.col)
             else:
                 print(self.currentSquare.isTouchingTop)
-                #self.redChecker.position = self.currentSquare.position
                 print(self.currentSquare.row, self.currentSquare.col)
         if self.isKeyPressed(pygame.K_DOWN):
             if self.currentSquare.isTouchingBottom:
@@ -98,11 +92,9 @@ class Game(simpleGE.Scene):
                 if self.checkerboard[self.currentSquare.row + 1][self.currentSquare.col].color != 2:
                     self.redChecker.position = self.checkerboard[self.currentSquare.row + 1][self.currentSquare.col].position
                     self.checkerboard[self.currentSquare.row + 1][self.currentSquare.col].checkCollision()
-                    self.redChecker.currentSquare = self.checkerboard[self.currentSquare.row + 1][self.currentSquare.col]
                     print(self.currentSquare.row, self.currentSquare.col)
             else:
                 print(self.currentSquare.isTouchingBottom)
-                #self.redChecker.position = self.currentSquare.position
                 print(self.currentSquare.row, self.currentSquare.col)
             
     def loadCheckerboard(self):
@@ -171,13 +163,13 @@ class Square(simpleGE.Sprite):
         self.setSize(50,50)
 
     def isTouchingSide(self, row, col):
-        if (col - 1) > 1:
+        if (col - 1) > 0:
             if self.scene.checkerboard[row][col - 1]:
                 self.isTouchingLeft = True
         if (col + 1) < self.scene.COLS + 1:
             if self.scene.checkerboard[row][col + 1]:
                 self.isTouchingRight = True
-        if (row - 1) > 1:
+        if (row - 1) > 0:
             if self.scene.checkerboard[row - 1][col]:
                 self.isTouchingTop = True
         if (row + 1) < self.scene.ROWS + 1:
