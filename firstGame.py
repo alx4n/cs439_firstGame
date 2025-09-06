@@ -4,25 +4,25 @@ import pygame, simpleGE, random, csv
 Asset Attributions:
 
 cards - Kenney: https://www.kenney.nl/assets/playing-cards-pack
+checkers - Kenney: https://www.kenney.nl/assets/boardgame-pack
+squares - made in Krita
 
 """
 
 class Game(simpleGE.Scene):
     def __init__(self, size = (640, 640)):
-        super().__init__()
-        self.screen = pygame.display.set_mode(size)
-        self.background = pygame.Surface(self.screen.get_size())
+        super().__init__(size)
         pygame.Surface.fill(self.background, (0, 128, 255))
         
         self.cards = []
         with open('assets/card images/_cards.csv', newline='') as csvfile:
             reader = csv.DictReader(csvfile, delimiter=",")
             for row in reader:
-                newCard = Card(row['card_name'], row['movement_points'], row['color'], row['placement'], pygame.image.load('assets/card images/' + row['card_name'] + '.png'))
+                newCard = CardStruct(row['card_name'], row['movement_points'], row['color'], row['placement'], pygame.image.load('assets/card images/' + row['card_name'] + '.png'))
                 self.cards.append(newCard)
         self.onScreenCards = []
         for i in range(4):
-            newCard = CardSprite(self)
+            newCard = Card(self)
             newCard.position = (150 + (i * 100), 500)
             newCard.hide()
             self.onScreenCards.append(newCard)
@@ -32,8 +32,8 @@ class Game(simpleGE.Scene):
         self.ROWS = 8
         self.COLS = 8
         self.loadCheckerboard()
-        self.row = 0
-        self.col = 7
+        self.row = 8
+        self.col = 1
         self.currentSquare = self.checkerboard[self.row][self.col]
         
         self.redChecker = Checker(self)
@@ -42,9 +42,6 @@ class Game(simpleGE.Scene):
         self.sprites = [self.checkerboard, self.redChecker, self.onScreenCards]
 
     def process(self):
-        for row in self.checkerboard:
-            for square in row:
-                square.isTouchingSide()
         if self.onScreenCards[1].visible == False:
             if self.onScreenCards[0].clicked:
                 for i in range(1,4):
@@ -56,26 +53,79 @@ class Game(simpleGE.Scene):
                 print("You can move " + str(self.cards[index].value) + " space(s)")
                 self.redChecker.moveSpaces()
                 self.onScreenCards[i].drawCard()
+
+    def processEvent(self, event):
+        self.currentSquare.isTouchingSide(self.currentSquare.row, self.currentSquare.col)
+        if self.isKeyPressed(pygame.K_LEFT):
+            if self.currentSquare.isTouchingLeft:
+                print(self.currentSquare.isTouchingLeft)
+                if self.checkerboard[self.currentSquare.row][self.currentSquare.col - 1].color != 2:
+                    self.redChecker.position = self.checkerboard[self.currentSquare.row][self.currentSquare.col - 1].position
+                    self.checkerboard[self.currentSquare.row][self.currentSquare.col - 1].checkCollision()
+                    self.currentSquare = self.checkerboard[self.currentSquare.row][self.currentSquare.col - 1]
+                    print(self.currentSquare.row, self.currentSquare.col)
+            else:
+                print(self.currentSquare.isTouchingLeft)
+               # self.redChecker.position = self.currentSquare.position
+                print(self.currentSquare.row, self.currentSquare.col)
+        if self.isKeyPressed(pygame.K_RIGHT):
+            if self.currentSquare.isTouchingRight:
+                print(self.currentSquare.isTouchingRight)
+                if self.checkerboard[self.currentSquare.row][self.currentSquare.col + 1].color != 2:
+                    self.redChecker.position = self.checkerboard[self.currentSquare.row][self.currentSquare.col + 1].position
+                    self.checkerboard[self.currentSquare.row][self.currentSquare.col + 1].checkCollision()
+                    self.currentSquare = self.checkerboard[self.currentSquare.row][self.currentSquare.col + 1]
+                    print(self.currentSquare.row, self.currentSquare.col)
+            else:
+                print(self.currentSquare.isTouchingRight)
+                #self.redChecker.position = self.currentSquare.position
+                print(self.currentSquare.row, self.currentSquare.col)
+        if self.isKeyPressed(pygame.K_UP):
+            if self.currentSquare.isTouchingTop:
+                print(self.currentSquare.isTouchingTop)
+                if self.checkerboard[self.currentSquare.row - 1][self.currentSquare.col].color != 2:
+                    self.redChecker.position = self.checkerboard[self.currentSquare.row - 1][self.currentSquare.col].position
+                    self.checkerboard[self.currentSquare.row - 1][self.currentSquare.col].checkCollision()
+                    self.currentSquare = self.checkerboard[self.currentSquare.row - 1][self.currentSquare.col]
+                    print(self.currentSquare.row, self.currentSquare.col)
+            else:
+                print(self.currentSquare.isTouchingTop)
+                #self.redChecker.position = self.currentSquare.position
+                print(self.currentSquare.row, self.currentSquare.col)
+        if self.isKeyPressed(pygame.K_DOWN):
+            if self.currentSquare.isTouchingBottom:
+                print(self.currentSquare.isTouchingBottom)
+                if self.checkerboard[self.currentSquare.row + 1][self.currentSquare.col].color != 2:
+                    self.redChecker.position = self.checkerboard[self.currentSquare.row + 1][self.currentSquare.col].position
+                    self.checkerboard[self.currentSquare.row + 1][self.currentSquare.col].checkCollision()
+                    self.redChecker.currentSquare = self.checkerboard[self.currentSquare.row + 1][self.currentSquare.col]
+                    print(self.currentSquare.row, self.currentSquare.col)
+            else:
+                print(self.currentSquare.isTouchingBottom)
+                #self.redChecker.position = self.currentSquare.position
+                print(self.currentSquare.row, self.currentSquare.col)
             
     def loadCheckerboard(self):
         map = [
-            [0,1,0,1,0,1,0,1],
-            [1,0,1,0,1,0,1,0],
-            [0,1,0,1,0,1,0,1],
-            [1,0,1,0,1,0,1,0],
-            [0,1,0,1,0,1,0,1],
-            [1,0,1,0,1,0,1,0],
-            [0,1,0,1,0,1,0,1],
-            [1,0,1,0,1,0,1,0]
+            [2,2,2,2,2,2,2,2,2,2],
+            [2,0,1,0,1,0,1,0,1,2],
+            [2,1,0,1,0,1,0,1,0,2],
+            [2,0,1,0,1,0,1,0,1,2],
+            [2,1,0,1,0,1,0,1,0,2],
+            [2,0,1,0,1,0,1,0,1,2],
+            [2,1,0,1,0,1,0,1,0,2],
+            [2,0,1,0,1,0,1,0,1,2],
+            [2,1,0,1,0,1,0,1,0,2],
+            [2,2,2,2,2,2,2,2,2,2]
         ]
 
-        for row in range(self.ROWS):
+        for row in range(self.ROWS + 2):
             self.checkerboard.append([])
-            for col in range(self.COLS):
+            for col in range(self.COLS + 2):
                 currentVal = map[row][col]
                 newSquare = Square(self)
-                newSquare.setState(currentVal)
-                newSquare.position = (150 + (50 * row), 25 + (50 * col))
+                newSquare.setColor(currentVal)
+                newSquare.position = (100 + (50 * col), 0 + (50 * row))
                 newSquare.row = row
                 newSquare.col = col
                 self.checkerboard[row].append(newSquare)
@@ -85,44 +135,54 @@ class Square(simpleGE.Sprite):
         super().__init__(scene)
         self.images = [
             pygame.image.load("assets/red-square.png"),
-            pygame.image.load("assets/black-square.png")
+            pygame.image.load("assets/black-square.png"),
+            pygame.image.load("assets/transparent-square.png")
         ]
         self.setSize(50,50)
+        # color of square
         self.RED = 0
         self.BLACK = 1
-        self.state = self.RED
-        self.setBoundAction(self.HIDE)
-        self.row = 0
-        self.col = 0
+        self.TRANSPARENT = 2
+        self.color = self.RED
+
+        # state of square
+        self.EMPTY = 0
+        self.OCCUPIED = 1
+        self.state = self.EMPTY
+
+        self.setBoundAction(self.CONTINUE)
+
         self.isTouchingLeft = False
         self.isTouchingRight = False
         self.isTouchingBottom = False
         self.isTouchingTop = False
 
-    def setState(self, state):
-        self.state = state
-        self.copyImage(self.images[state])
-        self.setSize(50,50)
-    
-    def changeState(self, state):
-        if state == self.RED:
-            self.copyImage(self.images[self.BLACK])
-            self.setSize(50,50)
-        else:
-            self.copyImage(self.images[self.RED])
-            self.setSize(50,50)
+    def process(self):
+        pass
+        
+    def checkCollision(self):
+        if self.collidesWith(self.scene.redChecker):
+            self.state = self.OCCUPIED
+            self.scene.currentSquare = self
 
-    def isTouchingSide(self):
-        if self.scene.checkerboard[self.row][self.col - 1]:
-            self.isTouchingLeft = True   
-        if (self.col + 1) < self.scene.COLS:
-            if self.scene.checkerboard[self.row][self.col + 1]:
-              self.isTouchingRight = True
-        if self.scene.checkerboard[self.row - 1][self.col]:
-            self.isTouchingTop = True
-        if (self.row + 1) < self.scene.ROWS:
-            if self.scene.checkerboard[self.row + 1][self.col] != None:
-                self.isTouchingBottom = True       
+    def setColor(self, color):
+        self.color = color
+        self.copyImage(self.images[color])
+        self.setSize(50,50)
+
+    def isTouchingSide(self, row, col):
+        if (col - 1) > 1:
+            if self.scene.checkerboard[row][col - 1]:
+                self.isTouchingLeft = True
+        if (col + 1) < self.scene.COLS + 1:
+            if self.scene.checkerboard[row][col + 1]:
+                self.isTouchingRight = True
+        if (row - 1) > 1:
+            if self.scene.checkerboard[row - 1][col]:
+                self.isTouchingTop = True
+        if (row + 1) < self.scene.ROWS + 1:
+            if self.scene.checkerboard[row + 1][col]:
+                self.isTouchingBottom = True
 
 class Checker(simpleGE.Sprite):
     def __init__(self, scene):
@@ -135,43 +195,13 @@ class Checker(simpleGE.Sprite):
         self.BLACK = 1
         self.state = self.RED
         self.setSize(40,40)
-        self.setBoundAction(self.CONTINUE)
+        self.currentSquare = self.scene.currentSquare
 
     def setColor(self, state):
         self.state = state
         self.copyImage(self.images[self.state])
-    
-    def process(self):
-        self.moveSpaces()
-                
-    def moveSpaces(self):
-        if self.isKeyPressed(pygame.K_LEFT):
-            if self.scene.currentSquare.isTouchingLeft:
-                self.position = self.scene.checkerboard[self.scene.row - 1][self.scene.col].position
-                self.scene.currentSquare = self.scene.checkerboard[self.scene.row - 1][self.scene.col]
-            else:
-                self.position = self.scene.currentSquare.position
-        if self.isKeyPressed(pygame.K_RIGHT):
-            if self.scene.currentSquare.isTouchingRight:
-                self.position = self.scene.checkerboard[self.scene.row + 1][self.scene.col].position
-                self.scene.currentSquare = self.scene.checkerboard[self.scene.row + 1][self.scene.col]
-            else:
-                self.position = self.scene.currentSquare.position
-        if self.isKeyPressed(pygame.K_UP):
-            if self.scene.currentSquare.isTouchingTop:
-                self.position = self.scene.checkerboard[self.scene.row][self.scene.col - 1].position
-                self.scene.currentSquare = self.scene.checkerboard[self.scene.row][self.scene.col - 1]
-            else:
-                self.position = self.scene.currentSquare.position
-        if self.isKeyPressed(pygame.K_DOWN):
-            if self.scene.currentSquare.isTouchingBottom:
-                self.position = self.scene.checkerboard[self.scene.row][self.scene.col + 1].position
-                self.scene.currentSquare = self.scene.checkerboard[self.scene.row][self.scene.col + 1]
-            else:
-                self.position = self.scene.currentSquare.position
-        pass
 
-class Card():
+class CardStruct():
     def __init__(self, name, value, color, placement, image):
         self.name = name
         self.value = value
@@ -179,7 +209,7 @@ class Card():
         self.placement = placement
         self.image = image
 
-class CardSprite(simpleGE.Sprite):
+class Card(simpleGE.Sprite):
     def __init__(self, scene):
         super().__init__(scene)
         self.setImage("assets/card images/card_back.png")
